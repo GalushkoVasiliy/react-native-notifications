@@ -59,15 +59,14 @@ public class PushNotification implements IPushNotification {
 
     @Override
     public void onReceived() throws InvalidNotificationException {
-        if (!mAppLifecycleFacade.isAppVisible()) {
-            postNotification(null);
-        }
+        postNotification(null);
         notifyReceivedToJS();
     }
 
     @Override
     public void onOpened() {
         digestNotification();
+        clearAllNotifications();
     }
 
     @Override
@@ -155,7 +154,7 @@ public class PushNotification implements IPushNotification {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
                     CHANNEL_NAME,
-                    NotificationManager.IMPORTANCE_DEFAULT);
+                    NotificationManager.IMPORTANCE_HIGH);
             final NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.createNotificationChannel(channel);
             notification.setChannelId(CHANNEL_ID);
@@ -192,6 +191,11 @@ public class PushNotification implements IPushNotification {
     protected void postNotification(int id, Notification notification) {
         final NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(id, notification);
+    }
+
+    protected void clearAllNotifications() {
+        final NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancelAll();
     }
 
     protected int createNotificationId(Notification notification) {
